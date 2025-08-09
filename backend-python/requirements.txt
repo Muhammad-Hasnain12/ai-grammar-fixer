@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+pydantic
+transformers
+torch
+httpx
+huggingface-hub
+numpy
+
+
