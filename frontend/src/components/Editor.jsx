@@ -12,7 +12,7 @@ export default function Editor({ text, setText, correctedText, loading, onSubmit
 
   return (
     <div className="space-y-10">
-      <div className="group rounded-3xl bg-gradient-to-br from-white/70 to-white/50 p-8 shadow-2xl backdrop-blur-md border border-white/30 dark:from-gray-800/70 dark:to-gray-800/50 dark:border-gray-700/40 hover:shadow-3xl transition-all duration-300">
+      <div className="group rounded-3xl p-8 shadow-2xl backdrop-blur-md border bg-gray-900/40 border-gray-800/50 dark:bg-gray-900/40 dark:border-gray-800/50 hover:shadow-3xl transition-all duration-300">
         <div className="flex items-center justify-between mb-6">
           <label className="flex items-center space-x-3 text-xl font-bold text-gray-800 dark:text-white">
             <div className="rounded-lg bg-gradient-to-r from-blue-500 to-purple-600 p-2 text-white shadow-lg">
@@ -45,7 +45,7 @@ export default function Editor({ text, setText, correctedText, loading, onSubmit
         
         <div className="relative group">
           <textarea
-            className="w-full min-h-[280px] rounded-2xl border-2 border-gray-200/50 bg-white/90 p-6 text-gray-900 placeholder-gray-400 transition-all duration-300 outline-none focus:border-blue-400 focus:ring-4 focus:ring-blue-400/20 focus:bg-white resize-none dark:border-gray-600/50 dark:bg-gray-800/90 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-500 dark:focus:bg-gray-800"
+            className="w-full min-h-[280px] rounded-2xl border-2 border-gray-700/50 bg-gray-900/90 p-6 text-gray-100 placeholder-gray-500 transition-all duration-300 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/20 focus:bg-gray-900 resize-none dark:border-gray-600/50 dark:bg-gray-800/90 dark:text-gray-100 dark:placeholder-gray-500 dark:focus:border-blue-500 dark:focus:bg-gray-800"
             placeholder="🎯 Start typing or paste your text here for AI-powered grammar correction...
 
 💡 Tips:
@@ -125,15 +125,15 @@ export default function Editor({ text, setText, correctedText, loading, onSubmit
       </div>
 
       {/* Quick Examples Section */}
-      <div className="rounded-3xl bg-gradient-to-br from-indigo-50/80 to-purple-50/80 p-6 shadow-xl backdrop-blur-sm border border-indigo-100/50 dark:from-indigo-900/30 dark:to-purple-900/30 dark:border-indigo-800/30">
+      <div className="rounded-3xl p-6 shadow-xl backdrop-blur-sm bg-gray-900/40 border border-gray-800/50 dark:bg-gray-900/40 dark:border-gray-800/50">
         <div className="flex items-center space-x-3 mb-4">
           <div className="rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 p-2 text-white shadow-lg">
             <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
           </div>
-          <h3 className="text-lg font-bold text-gray-800 dark:text-white">Quick Examples</h3>
-          <span className="text-sm text-gray-500 dark:text-gray-400">Try these sample texts</span>
+          <h3 className="text-lg font-bold text-gray-200 dark:text-white">Quick Examples</h3>
+          <span className="text-sm text-gray-400 dark:text-gray-400">Try these sample texts</span>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -157,15 +157,15 @@ export default function Editor({ text, setText, correctedText, loading, onSubmit
             <button
               key={index}
               onClick={() => setText(example.text)}
-              className="group text-left p-4 rounded-xl bg-white/60 hover:bg-white/80 border border-white/40 hover:border-indigo-200 shadow-md hover:shadow-lg transition-all duration-300 dark:bg-gray-800/60 dark:hover:bg-gray-800/80 dark:border-gray-700/40 dark:hover:border-indigo-700"
+              className="group text-left p-4 rounded-xl bg-gray-900/60 hover:bg-gray-900/80 border border-gray-800/50 hover:border-indigo-700/50 shadow-md hover:shadow-lg transition-all duration-300 dark:bg-gray-800/60 dark:hover:bg-gray-800/80 dark:border-gray-700/50"
             >
               <div className="flex items-center justify-between mb-2">
-                <h4 className="font-semibold text-gray-800 dark:text-white">{example.title}</h4>
+                <h4 className="font-semibold text-gray-200 dark:text-white">{example.title}</h4>
                 <span className="text-xs px-2 py-1 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300">
                   {example.category}
                 </span>
               </div>
-              <p className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-gray-800 dark:group-hover:text-gray-200 transition-colors overflow-hidden" style={{display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical'}}>
+              <p className="text-sm text-gray-400 dark:text-gray-400 group-hover:text-gray-300 dark:group-hover:text-gray-200 transition-colors overflow-hidden" style={{display: '-webkit-box', WebkitLineClamp: 3, WebkitBoxOrient: 'vertical'}}>
                 {example.text}
               </p>
               <div className="mt-3 flex items-center text-xs text-indigo-600 dark:text-indigo-400 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -180,9 +180,9 @@ export default function Editor({ text, setText, correctedText, loading, onSubmit
       </div>
 
       {correctedText && (
-        <div className="rounded-2xl bg-white/60 p-6 shadow-xl backdrop-blur-sm border border-white/20 dark:bg-gray-800/60 dark:border-gray-700/30">
+        <div className="rounded-2xl p-6 shadow-xl backdrop-blur-sm bg-gray-900/50 border border-gray-800/50 dark:bg-gray-800/60 dark:border-gray-700/50">
           <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
+            <h3 className="text-lg font-semibold text-gray-200 dark:text-white flex items-center gap-2">
               <svg className="h-5 w-5 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
@@ -197,13 +197,13 @@ export default function Editor({ text, setText, correctedText, loading, onSubmit
                   navigator.clipboard.writeText(correctedText)
                   onToast?.({ message: 'Corrected text copied! ✨', type: 'success' })
                 }}
-                className="rounded-lg bg-green-100 px-3 py-1.5 text-sm font-medium text-green-700 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-300 dark:hover:bg-green-900/50 transition-colors"
+                className="rounded-lg bg-green-900/30 px-3 py-1.5 text-sm font-medium text-green-300 hover:bg-green-900/50 transition-colors"
               >
                 Copy Corrected
               </button>
             </div>
           </div>
-          <div className="min-h-[140px] max-w-full overflow-hidden break-words whitespace-pre-wrap rounded-xl border-2 border-green-200 bg-green-50/50 p-4 text-gray-900 dark:border-green-700 dark:bg-green-900/20 dark:text-gray-100">
+          <div className="min-h-[140px] max-w-full overflow-hidden break-words whitespace-pre-wrap rounded-xl border-2 border-green-700 bg-green-900/20 p-4 text-gray-100">
             {correctedText}
           </div>
           <div className="mt-3 flex items-center space-x-4 text-sm text-gray-600 dark:text-gray-400">
@@ -224,10 +224,10 @@ export default function Editor({ text, setText, correctedText, loading, onSubmit
       )}
 
       {wordDiff.length > 0 && (
-        <div className="rounded-2xl bg-white/60 p-6 shadow-xl backdrop-blur-sm border border-white/20 dark:bg-gray-800/60 dark:border-gray-700/30">
+        <div className="rounded-2xl p-6 shadow-xl backdrop-blur-sm bg-gray-900/50 border border-gray-800/50 dark:bg-gray-800/60 dark:border-gray-700/50">
           <h3 className="mb-4 text-lg font-semibold text-gray-800 dark:text-white flex items-center gap-2">
             <svg className="h-5 w-5 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M12 8v8m0 0H8m4 0h4" />
             </svg>
             Changes Made
           </h3>

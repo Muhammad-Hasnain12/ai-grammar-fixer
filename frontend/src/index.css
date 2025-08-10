@@ -64,6 +64,73 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Smooth theme transitions */
+html {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* More selective transitions to avoid performance impact */
+.theme-transition {
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Performance optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+/* Reduce paint operations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* Optimize animations for better performance */
+.animate-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: .5;
+  }
+}
+
+/* Optimize scrolling performance */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Improve text rendering */
+body {
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Prevent layout shifts */
+img, video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Optimize focus states */
+*:focus {
+  outline-offset: 2px;
+}
+
+/* Improve interaction performance */
+button, a, [role="button"] {
+  touch-action: manipulation;
+}
+
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
