@@ -29,14 +29,14 @@ export default function App() {
     setLoading(true)
     setCorrections([])
     try {
-      const res = await fetch(`${apiBaseUrl}/api/correct`, {
+      const res = await fetch(`${apiBaseUrl}/check`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       })
       if (!res.ok) throw new Error(`Request failed: ${res.status}`)
       const data = await res.json()
-      setCorrectedText(data.corrected_text || '')
+      setCorrectedText(data.correctedText || '')
       setCorrections(Array.isArray(data.corrections) ? data.corrections : [])
       setToast({
         message: 'Grammar correction completed successfully! ✨',
