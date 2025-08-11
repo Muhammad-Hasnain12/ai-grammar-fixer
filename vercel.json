@@ -38,13 +38,5 @@
       "src": "/(.*)",
       "dest": "/frontend/index.html"
     }
-  ],
-  "functions": {
-    "backend/api/check.js": {
-      "maxDuration": 30
-    },
-    "backend/api/check-grammar.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }
