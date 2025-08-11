@@ -24,7 +24,7 @@ export default function App() {
   const [policyModal, setPolicyModal] = useState(null) // 'privacy' | 'terms' | 'support' | null
   const [isOnline, setIsOnline] = useState(navigator.onLine)
   const [recentCorrections, setRecentCorrections] = useState([])
-  const apiBaseUrl = import.meta.env.VITE_API_URL || ''
+  const apiBaseUrl = import.meta.env.VITE_API_URL || (window.location.origin + '')
 
   // Apply theme class before first paint to avoid flash
   useLayoutEffect(() => {
