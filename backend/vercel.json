@@ -2,26 +2,29 @@
   "version": 2,
   "builds": [
     {
-      "src": "index.js",
+      "src": "api/**/*.js",
       "use": "@vercel/node"
     }
   ],
   "routes": [
     {
       "src": "/check",
-      "dest": "/index.js"
+      "dest": "/api/check.js"
     },
     {
       "src": "/check-grammar",
-      "dest": "/index.js"
+      "dest": "/api/check-grammar.js"
     },
     {
-      "src": "/(.*)",
-      "dest": "/index.js"
+      "src": "/",
+      "dest": "/api/check-grammar.js"
     }
   ],
   "functions": {
-    "index.js": {
+    "api/check.js": {
+      "maxDuration": 30
+    },
+    "api/check-grammar.js": {
       "maxDuration": 30
     }
   }
