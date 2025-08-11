@@ -9,10 +9,71 @@ const PORT = process.env.PORT || 3001;
 const MAX_CHUNK_SIZE = 1000; // Maximum characters per chunk
 const LANGUAGETOOL_API_URL = 'https://api.languagetool.org/v2/check';
 
+// Rate limiting
+const rateLimit = new Map();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const MAX_REQUESTS_PER_WINDOW = 10; // 10 requests per minute
+
+// Rate limiting middleware
+function rateLimiter(req, res, next) {
+  const clientIP = req.ip || req.connection.remoteAddress || 'unknown';
+  const now = Date.now();
+  
+  if (!rateLimit.has(clientIP)) {
+    rateLimit.set(clientIP, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+  } else {
+    const clientData = rateLimit.get(clientIP);
+    
+    if (now > clientData.resetTime) {
+      // Reset window
+      clientData.count = 1;
+      clientData.resetTime = now + RATE_LIMIT_WINDOW;
+    } else if (clientData.count >= MAX_REQUESTS_PER_WINDOW) {
+      return res.status(429).json({
+        success: false,
+        error: 'Rate limit exceeded',
+        message: 'Too many requests. Please wait a moment and try again.',
+        retryAfter: Math.ceil((clientData.resetTime - now) / 1000)
+      });
+    } else {
+      clientData.count++;
+    }
+  }
+  
+  next();
+}
+
+// Clean up old rate limit entries every 5 minutes
+setInterval(() => {
+  const now = Date.now();
+  for (const [ip, data] of rateLimit.entries()) {
+    if (now > data.resetTime) {
+      rateLimit.delete(ip);
+    }
+  }
+}, 300000);
+
+// CORS configuration
+const corsOptions = {
+  origin: process.env.CORS_ORIGIN || ['http://localhost:5173', 'http://localhost:3000', 'https://grammar-fixer.vercel.app'],
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: false,
+  maxAge: 86400 // 24 hours
+};
+
 // Middleware
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' })); // Increase limit for large texts
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  next();
+});
 
 // Helper function to split text into chunks without cutting words
 function splitTextIntoChunks(text, maxChunkSize = MAX_CHUNK_SIZE) {
@@ -144,13 +205,14 @@ app.get('/', (req, res) => {
 });
 
 // Main grammar checking endpoint with chunking support
-app.post('/check-grammar', async (req, res) => {
+app.post('/check-grammar', rateLimiter, async (req, res) => {
   try {
     const { text } = req.body;
 
-    // Validate input
+    // Enhanced input validation
     if (!text || typeof text !== 'string') {
       return res.status(400).json({
+        success: false,
         error: 'Invalid input',
         message: 'Text field is required and must be a string'
       });
@@ -158,8 +220,18 @@ app.post('/check-grammar', async (req, res) => {
 
     if (text.trim().length === 0) {
       return res.status(400).json({
+        success: false,
         error: 'Invalid input',
         message: 'Text cannot be empty'
+      });
+    }
+
+    // Check text length limits
+    if (text.length > 50000) {
+      return res.status(400).json({
+        success: false,
+        error: 'Text too long',
+        message: 'Text cannot exceed 50,000 characters. Please split into smaller sections.'
       });
     }
 
@@ -241,21 +313,24 @@ app.post('/check-grammar', async (req, res) => {
   } catch (error) {
     console.error('Grammar check error:', error);
     res.status(500).json({
+      success: false,
       error: 'Grammar check failed',
-      details: error.message,
+      message: error.message || 'An unexpected error occurred',
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
       timestamp: new Date().toISOString()
     });
   }
 });
 
 // Legacy endpoint for backward compatibility
-app.post('/check', async (req, res) => {
+app.post('/check', rateLimiter, async (req, res) => {
   try {
     const { text } = req.body;
 
-    // Validate input
+    // Enhanced input validation
     if (!text || typeof text !== 'string') {
       return res.status(400).json({
+        success: false,
         error: 'Invalid input',
         message: 'Text field is required and must be a string'
       });
@@ -263,8 +338,18 @@ app.post('/check', async (req, res) => {
 
     if (text.trim().length === 0) {
       return res.status(400).json({
+        success: false,
         error: 'Invalid input',
         message: 'Text cannot be empty'
+      });
+    }
+
+    // Check text length limits
+    if (text.length > 50000) {
+      return res.status(400).json({
+        success: false,
+        error: 'Text too long',
+        message: 'Text cannot exceed 50,000 characters. Please split into smaller sections.'
       });
     }
 
@@ -307,8 +392,11 @@ app.post('/check', async (req, res) => {
   } catch (error) {
     console.error('Grammar check error:', error);
     res.status(500).json({
+      success: false,
       error: 'Grammar check failed',
-      details: error.message
+      message: error.message || 'An unexpected error occurred',
+      details: process.env.NODE_ENV === 'development' ? error.stack : undefined,
+      timestamp: new Date().toISOString()
     });
   }
 });

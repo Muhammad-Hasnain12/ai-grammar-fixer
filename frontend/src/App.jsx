@@ -22,6 +22,8 @@ export default function App() {
   const [loading, setLoading] = useState(false)
   const [toast, setToast] = useState(null)
   const [policyModal, setPolicyModal] = useState(null) // 'privacy' | 'terms' | 'support' | null
+  const [isOnline, setIsOnline] = useState(navigator.onLine)
+  const [recentCorrections, setRecentCorrections] = useState([])
   const apiBaseUrl = import.meta.env.VITE_API_URL || ''
 
   // Apply theme class before first paint to avoid flash
@@ -34,6 +36,47 @@ export default function App() {
     localStorage.setItem('theme', theme)
   }, [theme])
 
+  // Online/offline detection
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true)
+    const handleOffline = () => setIsOnline(false)
+    
+    window.addEventListener('online', handleOnline)
+    window.addEventListener('offline', handleOffline)
+    
+    // Load recent corrections from localStorage
+    const saved = localStorage.getItem('recentCorrections')
+    if (saved) {
+      try {
+        setRecentCorrections(JSON.parse(saved))
+      } catch (e) {
+        console.error('Failed to load recent corrections:', e)
+      }
+    }
+    
+    return () => {
+      window.removeEventListener('online', handleOnline)
+      window.removeEventListener('offline', handleOffline)
+    }
+  }, [])
+
+  // Save corrections to localStorage
+  useEffect(() => {
+    if (correctedText && corrections.length > 0) {
+      const newCorrection = {
+        id: Date.now(),
+        originalText: text,
+        correctedText,
+        corrections: corrections,
+        timestamp: new Date().toISOString()
+      }
+      
+      const updated = [newCorrection, ...recentCorrections.slice(0, 9)] // Keep last 10
+      setRecentCorrections(updated)
+      localStorage.setItem('recentCorrections', JSON.stringify(updated))
+    }
+  }, [correctedText, corrections, text, recentCorrections])
+
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
 
   async function onSubmit() {
@@ -45,20 +88,44 @@ export default function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text }),
       })
-      if (!res.ok) throw new Error(`Request failed: ${res.status}`)
+      
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}))
+        throw new Error(errorData.message || `Request failed: ${res.status} ${res.statusText}`)
+      }
+      
       const data = await res.json()
+      
+      if (!data.success) {
+        throw new Error(data.error || 'Grammar check failed')
+      }
+      
       setCorrectedText(data.correctedText || '')
       setCorrections(Array.isArray(data.corrections) ? data.corrections : [])
+      
       setToast({
-        message: 'Grammar correction completed successfully! ✨',
+        message: `Grammar correction completed! Found ${data.corrections?.length || 0} issues. ✨`,
         type: 'success'
       })
     } catch (err) {
-      console.error(err)
+      console.error('Grammar check error:', err)
       setCorrectedText('')
       setCorrections([])
+      
+      // More specific error messages
+      let errorMessage = 'Failed to process your text. Please try again.'
+      if (err.message.includes('fetch')) {
+        errorMessage = 'Network error. Please check your connection and try again.'
+      } else if (err.message.includes('timeout')) {
+        errorMessage = 'Request timed out. Please try with shorter text or try again later.'
+      } else if (err.message.includes('429')) {
+        errorMessage = 'Too many requests. Please wait a moment and try again.'
+      } else if (err.message) {
+        errorMessage = err.message
+      }
+      
       setToast({
-        message: 'Failed to process your text. Please try again.',
+        message: errorMessage,
         type: 'error'
       })
     } finally {
@@ -117,6 +184,14 @@ export default function App() {
           
           {/* Right Side Actions */}
           <div className="flex items-center space-x-4">
+            {/* Offline Indicator */}
+            {!isOnline && (
+              <div className="flex items-center space-x-2 px-3 py-2 rounded-lg bg-yellow-900/30 border border-yellow-700/50">
+                <div className="w-2 h-2 rounded-full bg-yellow-500 animate-pulse"></div>
+                <span className="text-xs text-yellow-400 font-medium">Offline</span>
+              </div>
+            )}
+            
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
